@@ -1,4 +1,5 @@
 📋 Terminal Guide (/terminal-guide)
+
 Toto je super dôležitý príkaz pre prácu s terminálom v Claude Code!
 bash# V Claude Code session napíš:
 /terminal-guide
