@@ -298,3 +298,175 @@ Ty: "Spusti testy, oprav bugs, commitni"
 → Claude finalizuje
 3. Documentation-first approach:
 Najprv vytvor dobrý CLAUDE.md, potom nechaj Claude robiť!
+
+
+---- 
+
+  prakticky pre spustenie novej konverzácie stačí napísať : claude 
+  je to čistý štart bez historie 
+
+  # Automaticky pokračuje v poslednej konverzácii
+  claude --continue
+
+  # Interaktívny picker - zobrazí zoznam konverzácií s popisom, časom, počtom správ
+  claude --resume
+
+  ----
+
+   Scenár B: Worktrees (pokročilé) 🚀
+
+  | Situácia                     | Postup                           | Výhoda                     | Nevýhoda                  |
+  |------------------------------|----------------------------------|----------------------------|---------------------------|
+  | Implementuješ API na vetva   | Vytvoríš worktree feature-api    | Dva Claude sessions naraz! | Zložitejší setup          |
+  | Súčasne refaktoruješ DB      | Vytvoríš worktree refactor-db    | Každý má vlastnú Git vetvu | Viac disk space           |
+  | Obe sessions bežia paralelne | Každý worktree = vlastný adresár | Žiadne Git konflikty       | Musíš spravovať worktrees |
+
+  Každý worktree má svoj Git stav (branch, súbory, Claude session)
+
+  ---
+  Kedy použiť čo?
+
+  ✅ Resume - Použiť keď:
+
+  - Pracuješ na jednej veci v danom čase
+  - Chceš len organizovať konverzácie tematicky
+  - Nechceš riešiť Git vetvy/worktrees
+  - → Tvoj prípad: teória vs. implementácia v rôznych časoch
+
+  ✅ Worktrees - Použiť keď:
+
+  - Chceš súčasne pracovať na viacerých vetvách (napr. feature-api a bugfix-parser)
+  - Potrebuješ dva Claude sessions naraz (jeden na API, druhý na frontend)
+  - Chceš izolovať zmeny v súboroch (aby si nepretekali)
+  - → Príklad: Backend dev na feature-api + Frontend dev na feature-ui súčasne
+
+  ---
+  Setup Worktrees (ak by si ich chcel skúsiť neskôr):
+
+  # 1. Si v hlavnom projekte
+  cd /home/tomasmucha/event-tracker-project
+
+  # 2. Vytvor worktree pre implementáciu API (nová vetva feature-api)
+  git worktree add backend-api-dev -b feature-api
+
+  # 3. Vytvor worktree pre refaktoring DB (nová vetva refactor-db)
+  git worktree add backend-db-refactor -b refactor-db
+
+  # 4. Zoznam worktrees
+  git worktree list
+  # Výstup:
+  # /home/tomasmucha/event-tracker-project        ae5bb90 [master]
+  # /home/tomasmucha/backend-api-dev              ae5bb90 [feature-api]
+  # /home/tomasmucha/backend-db-refactor          ae5bb90 [refactor-db]
+
+  # 5. V každom adresári spusť Claude
+  cd backend-api-dev
+  claude  # Session 1 - API implementácia
+
+  # V druhom termináli
+  cd ../backend-db-refactor
+  claude  # Session 2 - DB refaktoring
+
+  # 6. Keď skončíš, vymaž worktree
+  git worktree remove backend-api-dev
+
+  ---
+----
+
+
+ Worktrees + Claude sessions = Multi-agent systém v praxi:
+
+  Analógia s Multi-Agent systémom:
+
+  | Multi-Agent koncept           | Worktree + Claude implementácia             |
+  |-------------------------------|---------------------------------------------|
+  | Agent 1 (Backend specialist)  | Worktree backend-api + Claude session 1     |
+  | Agent 2 (Frontend specialist) | Worktree frontend-ui + Claude session 2     |
+  | Agent 3 (Database expert)     | Worktree db-optimization + Claude session 3 |
+  | Vlastný workspace             | Každý worktree = izolovaný adresár          |
+  | Vlastná pamäť/kontext         | Každá Claude session = vlastná história     |
+  | Paralelná práca               | Všetky sessions bežia súčasne               |
+  | Komunikácia/integrácia        | Git merge branches na konci                 |
+  | Task assignment               | Ty rozdeľuješ úlohy medzi sessions          |
+
+  ---
+  Praktický príklad multi-agent workflow:
+
+  # Agent 1: Backend API Developer
+  cd /home/tomasmucha/event-tracker-project
+  git worktree add agent-backend -b feature/rest-api
+  cd agent-backend
+  claude
+  # → Úloha: "Implementuj REST API endpointy pre positions a trackers"
+
+  # Agent 2: Frontend Developer (v druhom termináli)
+  cd /home/tomasmucha/event-tracker-project
+  git worktree add agent-frontend -b feature/web-ui
+  cd agent-frontend
+  claude
+  # → Úloha: "Vytvor React komponent pre zobrazenie mapy s trackermi"
+
+  # Agent 3: Database Optimizer (v treťom termináli)
+  cd /home/tomasmucha/event-tracker-project
+  git worktree add agent-db -b optimize/timescaledb
+  cd agent-db
+  clau
+
+  # Všetci traja pracujú SÚČASNE na rôznych častiach projektu!
+
+  ---
+  Výhody tohto "multi-agent" prístupu:
+
+  ✅ Paralelizmus - viacero úloh súčasne✅ Izolácia - žiadne Git konflikty medzi agentmi✅ Špecializácia - každý agent má jasne definovanú úlohu✅ Kontext - každý agent si pamätá len svoj task (nie je
+  zahltený inými témami)✅ Integrácia - nakoniec merge všetko cez Git
+
+  ---
+  Reálny use case pre tvoj projekt:
+
+  # Agent 1: "MQTT Parser Expert"
+  # Worktree: parser-improvements
+  # Task: Doladenie validácií, bug fixing, edge cases
+
+  # Agent 2: "API Developer"  
+  # Worktree: rest-api
+  # Task: Flask endpointy, WebSocket real-time updates
+
+  # Agent 3: "Frontend Engineer"
+  # Worktree: web-app
+  # Task: React UI, mapa, dashboard, grafy
+
+  Každý agent má:
+  - Vlastnú Git vetvu (bez konfliktov)
+  - Vlastnú Claude session (špecializovaný kontext)
+  - Vlastný working directory (izolácia súborov)
+
+  Na konci:
+  git checkout master
+  git merge parser-improvements
+  git merge rest-api
+  git merge web-app
+  # → Všetko integrované! 🎉
+
+  ---
+  Porovnanie s "klasickým" multi-agent frameworkom:
+
+  | Framework (napr. CrewAI, AutoGen)  | Worktree + Claude                         |
+  |------------------------------------|-------------------------------------------|
+  | Agenti komunikujú cez API/messages | Komunikujú cez Git (commits, branches)    |
+  | Orchestrátor riadi workflow        | Ty riadeš workflow manuálne               |
+  | Automatická koordinácia            | Manuálna koordinácia (merge)              |
+  | Jeden proces, viacero agentov      | Viacero procesov, každý = agent           |
+  | Vysoká komplexita                  | Nízka komplexita, prirodzený Git workflow |
+
+  ---
+  Takže áno - máš pravdu! 🎯
+
+  Worktrees sú low-tech, praktická implementácia multi-agent systému, kde:
+  - Git = koordinačný mechanizmus
+  - Worktrees = workspaces pre agentov
+  - Claude sessions = samotní agenti
+
+  Je to elegantné, jednoduché, a funguje s nástrojmi, ktoré už poznáš (Git)!
+
+---
+
